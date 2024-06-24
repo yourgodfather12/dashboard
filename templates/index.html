@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bot Dashboard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            background-color: #f8f9fa;
+        }
+        .jumbotron {
+            background: linear-gradient(to right, #007bff, #6610f2);
+            color: white;
+        }
+        .user-profile {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .user-profile img {
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .user-profile .username {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #343a40;
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+        .progress {
+            height: 20px;
+            border-radius: 10px;
+        }
+        .progress-bar {
+            border-radius: 10px;
+        }
+        .btn-outline-info, .btn-outline-primary, .btn-primary, .btn-secondary, .btn-danger {
+            border-radius: 20px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding: 10px 0;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="jumbotron jumbotron-fluid text-center mb-4">
+            <div class="container">
+                <h3 class="display-4">USA WINS</h3>
+                <h2 class="display-5">Discord Bot Dashboard</h2>
+                <p class="lead">Sharing Is Caring</p>
+                <div class="user-profile">
+                    <img src="{{ url_for('static', filename='images/user_avatar.png') }}" alt="User Avatar" width="50" height="50">
+                    <p class="username">{{ username }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        Manage Servers
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Manage the servers your bot is connected to.</p>
+                        <a href="{{ url_for('servers') }}" class="btn btn-primary">Manage Servers</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        Manage Commands
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Customize and manage bot commands.</p>
+                        <a href="{{ url_for('commands') }}" class="btn btn-secondary">Manage Commands</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        Manage Guild
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Manage specific guilds your bot is connected to.</p>
+                        {% if guilds %}
+                            <div class="btn-group-vertical">
+                                {% for guild in guilds %}
+                                    <a href="{{ url_for('guild', guild_id=guild.id) }}" class="btn btn-primary mb-2">{{ guild.name }}</a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="card-text">No guilds available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="btn btn-danger mb-4">Logout</a>
+    </div>
+
+    <footer class="footer">
+        &copy; 2024 Discord Bot Dashboard. All Rights Reserved.
+    </footer>
+
+    <!-- Include Chart.js for interactive charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('botPerformanceChart').getContext('2d');
+        var botPerformanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                datasets: [{
+                    label: 'Commands Processed',
+                    data: [65, 59, 80, 81, 56, 55, 40],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

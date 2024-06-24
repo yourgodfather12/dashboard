@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Commands</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            background-color: #f8f9fa;
+        }
+        .header {
+            background: linear-gradient(to right, #007bff, #6610f2);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #343a40;
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            text-align: center;
+            padding: 1rem 1.25rem;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .btn-outline-info, .btn-outline-primary, .btn-primary, .btn-secondary, .btn-danger {
+            border-radius: 20px;
+            margin: 0 5px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding: 10px 0;
+            text-align: center;
+            color: #6c757d;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        .modal-content {
+            border-radius: 15px;
+        }
+        .toast {
+            border-radius: 15px;
+        }
+        .centered-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+        .centered-text {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .alert {
+            margin-top: 1.5rem;
+        }
+        .btn-close {
+            margin-left: auto;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .add-command-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h3 class="display-4">USA WINS</h3>
+            <h2 class="display-5">Manage Commands</h2>
+            <p class="lead">Customize and manage your bot commands</p>
+        </div>
+
+        <a href="{{ url_for('index') }}" class="btn btn-secondary my-4">Back to Dashboard</a>
+
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        Custom Commands
+                    </div>
+                    <div class="card-body">
+                        <div class="add-command-btn">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#commandModal">Add Command</button>
+                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customCommandsTable">
+                                <!-- Custom commands will be dynamically populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        Slash Commands
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Cog</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="slashCommandsTable">
+                                <!-- Slash commands will be dynamically populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Command Modal -->
+    <div class="modal fade" id="commandModal" tabindex="-1" aria-labelledby="commandModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commandModalLabel">Add/Edit Command</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="commandForm">
+                        <input type="hidden" id="commandId">
+                        <div class="form-group">
+                            <label for="commandName" class="form-label">Command Name</label>
+                            <input type="text" class="form-control" id="commandName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="commandDescription" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="commandDescription" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="commandCog" class="form-label">Cog</label>
+                            <input type="text" class="form-control" id="commandCog" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Command</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toasts for Notifications -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="commandToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto" id="toastTitle">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastBody"></div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="spinner-border text-primary position-fixed top-50 start-50 translate-middle" role="status" style="display: none;">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Function to load custom commands table
+            function loadCustomCommands() {
+                $.ajax({
+                    url: '/get_custom_commands', // Endpoint to fetch custom commands
+                    type: 'GET',
+                    success: function (data) {
+                        $('#customCommandsTable').empty();
+                        data.forEach(function (command) {
+                            $('#customCommandsTable').append(`<tr data-id="${command.id}">
+                                <td>${command.name}</td>
+                                <td>${command.description}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm edit-btn" data-id="${command.id}">Edit</button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${command.id}">Delete</button>
+                                </td>
+                            </tr>`);
+                        });
+                    },
+                    error: function (error) {
+                        showToast('Error', 'Failed to fetch custom commands.');
+                    }
+                });
+            }
+
+            // Function to load slash commands table
+            function loadSlashCommands() {
+                $.ajax({
+                    url: '/get_slash_commands', // Endpoint to fetch slash commands
+                    type: 'GET',
+                    success: function (data) {
+                        $('#slashCommandsTable').empty();
+                        data.forEach(function (command) {
+                            $('#slashCommandsTable').append(`<tr data-id="${command.id}">
+                                <td>${command.name}</td>
+                                <td>${command.description}</td>
+                                <td>${command.cog}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm edit-btn" data-id="${command.id}">Edit</button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${command.id}">Delete</button>
+                                </td>
+                            </tr>`);
+                        });
+                    },
+                    error: function (error) {
+                        showToast('Error', 'Failed to fetch slash commands.');
+                    }
+                });
+            }
+
+            // Load commands on page load
+            loadCustomCommands();
+            loadSlashCommands();
+
+            // Form submission to handle add/edit command
+            $('#commandForm').on('submit', function (e) {
+                e.preventDefault();
+                const id = $('#commandId').val();
+                const name = $('#commandName').val();
+                const description = $('#commandDescription').val();
+                const cog = $('#commandCog').val();
+                const url = id ? `/edit_command/${id}` : '/add_command';
+                const method = id ? 'PUT' : 'POST';
+
+                $('#loadingSpinner').show();
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    contentType: 'application/json',
+                    data: JSON.stringify({ name, description, cog }),
+                    success: function (response) {
+                        showToast('Success', 'Command saved successfully!');
+                        $('#commandModal').modal('hide');
+                        loadCustomCommands(); // Reload custom commands table
+                        loadSlashCommands(); // Reload slash commands table
+                    },
+                    error: function (error) {
+                        showToast('Error', 'An error occurred. Please try again.');
+                    },
+                    complete: function () {
+                        $('#loadingSpinner').hide();
+                    }
+                });
+            });
+
+            // Edit button click handler
+            $(document).on('click', '.edit-btn', function () {
+                const id = $(this).data('id');
+                const row = $(`tr[data-id='${id}']`);
+                $('#commandId').val(id);
+                $('#commandName').val(row.find('td').eq(0).text());
+                $('#commandDescription').val(row.find('td').eq(1).text());
+                $('#commandCog').val(row.find('td').eq(2).text());
+                $('#commandModal').modal('show');
+            });
+
+            // Delete button click handler
+            $(document).on('click', '.delete-btn', function () {
+                const id = $(this).data('id');
+                if (confirm('Are you sure you want to delete this command?')) {
+                    $.ajax({
+                        url: `/delete_command/${id}`,
+                        type: 'DELETE',
+                        success: function (response) {
+                            showToast('Success', 'Command deleted successfully!');
+                            loadCustomCommands(); // Reload custom commands table
+                            loadSlashCommands(); // Reload slash commands table
+                        },
+                        error: function (error) {
+                            showToast('Error', 'An error occurred. Please try again.');
+                        }
+                    });
+                }
+            });
+
+            // Function to show toast notifications
+            function showToast(title, message) {
+                $('#toastTitle').text(title);
+                $('#toastBody').text(message);
+                $('#commandToast').toast('show');
+            }
+        });
+    </script>
+</body>
+</html>
